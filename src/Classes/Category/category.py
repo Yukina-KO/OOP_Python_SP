@@ -16,7 +16,9 @@ class Category:
         Category.product_count = len(self.__products)
 
     def add_product(self, product: Product) -> None:
-        """Метод для добавления нового товара в категорию."""
+        """Добавляет продукт в категорию, если он является экземпляром Product или его наследником."""
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты типа Product или его наследников")
         self.__products.append(product)
         Category.product_count = len(self.__products)
 
