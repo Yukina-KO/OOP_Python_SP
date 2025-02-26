@@ -10,7 +10,23 @@ def test_product_creation() -> None:
     assert product.quantity == 10
 
 
-def test_product_count_increment() -> None:
-    initial_count = Product.product_count
-    Product("Phone", "Latest model smartphone", 999.99, 5)
-    assert Product.product_count == initial_count + 1
+def test_product_price_setter() -> None:
+    product = Product("Phone", "Latest model smartphone", 999.99, 5)
+    product.price = 1200.00
+    assert product.price == 1200.00
+
+
+def test_product_price_negative() -> None:
+    product = Product("Tablet", "A lightweight tablet", 499.99, 7)
+    product.price = -50
+    assert product.price == 499.99
+
+
+def test_new_product_with_duplicates() -> None:
+    product1 = Product("Camera", "DSLR Camera", 800, 2)
+    duplicates = [product1]
+    new_product = Product.new_product(
+        {"name": "Camera", "description": "DSLR Camera", "price": 750, "quantity": 3}, duplicates
+    )
+    assert new_product.quantity == 5
+    assert new_product.price == 800

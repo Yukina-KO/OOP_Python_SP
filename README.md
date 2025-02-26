@@ -41,23 +41,23 @@ class Category:
     def __init__(self, name: str, description: str, products: list):
         self.name: str = name
         self.description: str = description
-        self.products: list = products
+        self.__products: list = products
 
         Category.category_count += 1
-        Category.product_count = len(self.products)
+        Category.product_count = len(self.__products)
+
+    def add_product(self, product):
+        self.__products.append(product)
+        Category.product_count = len(self.__products)
+
+    @property
+    def products(self):
+        lines = []
+        for prod in self.__products:
+            line = f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт."
+            lines.append(line)
+        return "\n".join(lines)
 ```
-
-#### Описание:
-- Отвечает за хранение информации о категории товаров.
-- Поля:
-  - `name` (str) - название категории.
-  - `description` (str) - описание категории.
-  - `products` (list) - список товаров в категории.
-- Статические переменные:
-  - `category_count` - счётчик категорий.
-  - `product_count` - количество товаров в последней созданной категории.
-
----
 
 ### 2. Класс `Product`
 
@@ -70,21 +70,45 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name: str = name
         self.description: str = description
-        self.price: float = price
+        self.__price: float = price
         self.quantity: int = quantity
 
         Product.product_count += 1
-```
 
-#### Описание:
-- Отвечает за хранение информации о конкретном продукте.
-- Поля:
-  - `name` (str) - название продукта.
-  - `description` (str) - описание продукта.
-  - `price` (float) - цена продукта.
-  - `quantity` (int) - количество единиц продукта на складе.
-- Статическая переменная:
-  - `product_count` - счётчик созданных объектов `Product`.
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, new_price: float):
+        if new_price <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+            return
+
+        if new_price < self.__price:
+            answer = input(f"Вы действительно хотите понизить цену с {self.__price} до {new_price}? (y/n): ")
+            if answer.lower() != "y":
+                return
+
+        self.__price = new_price
+
+    @classmethod
+    def new_product(cls, product_info: dict, duplicates_list: list = None):
+        name = product_info.get("name")
+        description = product_info.get("description")
+        price = product_info.get("price")
+        quantity = product_info.get("quantity")
+
+        if duplicates_list is not None:
+            for prod in duplicates_list:
+                if prod.name == name:
+                    prod.quantity += quantity
+                    if price > prod.price:
+                        prod.price = price
+                    return prod
+
+        return cls(name, description, price, quantity)
+```
 
 ## Тесты
 
@@ -93,30 +117,30 @@ class Product:
 **Файл:** `tests/test_category.py`
 
 ```python
-from src.Classes.Category.category import Category
 from src.Classes.Product.product import Product
+from src.Classes.Category.category import Category
 
-def test_category_creation() -> None:
-    product1 = Product("Tablet", "A lightweight tablet", 499.99, 7)
-    product2 = Product("Monitor", "4K Ultra HD Monitor", 299.99, 3)
+def test_category_creation():
+    product1 = Product("Monitor", "4K Ultra HD Monitor", 299.99, 3)
+    product2 = Product("Mouse", "Wireless Mouse", 29.99, 10)
     category = Category("Electronics", "Devices and gadgets", [product1, product2])
 
     assert category.name == "Electronics"
     assert category.description == "Devices and gadgets"
-    assert len(category.products) == 2
-    assert category.products[0].name == "Tablet"
-    assert category.products[1].name == "Monitor"
-
-def test_category_count_increment() -> None:
-    initial_category_count = Category.category_count
-    Category("Appliances", "Home appliances", [])
-    assert Category.category_count == initial_category_count + 1
-
-def test_category_product_count() -> None:
-    product1 = Product("Camera", "DSLR Camera", 799.99, 2)
-    product2 = Product("Headphones", "Noise-canceling headphones", 199.99, 8)
-    Category("Gadgets", "Wearable and portable devices", [product1, product2])
     assert Category.product_count == 2
+
+def test_category_add_product():
+    product = Product("Keyboard", "Mechanical keyboard", 99.99, 4)
+    category = Category("Accessories", "Computer accessories", [])
+    category.add_product(product)
+    assert Category.product_count == 1
+
+def test_category_products_format():
+    product1 = Product("Smartwatch", "Fitness tracking watch", 199.99, 5)
+    product2 = Product("Headphones", "Noise-canceling headphones", 149.99, 8)
+    category = Category("Wearables", "Wearable tech devices", [product1, product2])
+    expected_output = "Smartwatch, 199.99 руб. Остаток: 5 шт.\nHeadphones, 149.99 руб. Остаток: 8 шт."
+    assert category.products == expected_output
 ```
 
 ### 2. Тесты для `Product`
@@ -126,18 +150,29 @@ def test_category_product_count() -> None:
 ```python
 from src.Classes.Product.product import Product
 
-def test_product_creation() -> None:
+def test_product_creation():
     product = Product("Laptop", "A high-end gaming laptop", 1500.99, 10)
-
     assert product.name == "Laptop"
     assert product.description == "A high-end gaming laptop"
     assert product.price == 1500.99
     assert product.quantity == 10
 
-def test_product_count_increment() -> None:
-    initial_count = Product.product_count
-    Product("Phone", "Latest model smartphone", 999.99, 5)
-    assert Product.product_count == initial_count + 1
+def test_product_price_setter():
+    product = Product("Phone", "Latest model smartphone", 999.99, 5)
+    product.price = 1200.00
+    assert product.price == 1200.00
+
+def test_product_price_negative():
+    product = Product("Tablet", "A lightweight tablet", 499.99, 7)
+    product.price = -50
+    assert product.price == 499.99
+
+def test_new_product_with_duplicates():
+    product1 = Product("Camera", "DSLR Camera", 800, 2)
+    duplicates = [product1]
+    new_product = Product.new_product({"name": "Camera", "description": "DSLR Camera", "price": 750, "quantity": 3}, duplicates)
+    assert new_product.quantity == 5
+    assert new_product.price == 800
 ```
 
 ## Запуск тестов
@@ -147,5 +182,3 @@ def test_product_count_increment() -> None:
 ```sh
 pytest tests/
 ```
-
-Это выполнит все тесты, находящиеся в каталоге `tests/`.
