@@ -9,42 +9,36 @@ class Product:
         self.description: str = description
         self.__price: float = price
         self.quantity: int = quantity
-
         Product.product_count += 1
+
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """Сложение продуктов - возвращает общую стоимость всех товаров"""
+        if not isinstance(other, Product):
+            raise TypeError("Можно складывать только объекты Product")
+        return (self.price * self.quantity) + (other.price * other.quantity)
 
     @property
     def price(self) -> float:
-        """Геттер для получения цены"""
         return self.__price
 
     @price.setter
     def price(self, new_price: float) -> None:
-        """
-        Сеттер для установки новой цены.
-        Если цена меньше или равна 0 – выводим сообщение об ошибке.
-        Если новая цена ниже текущей, запрашиваем подтверждение у пользователя.
-        """
         if new_price <= 0:
             print("Цена не должна быть нулевая или отрицательная")
             return
-
         if new_price < self.__price:
             answer: str = input(f"Вы действительно хотите понизить цену с {self.__price} до {new_price}? (y/n): ")
             if answer.lower() != "y":
                 return
-
         self.__price = new_price
 
     @classmethod
     def new_product(
         cls, product_info: Dict[str, Union[str, float, int]], duplicates_list: Optional[List["Product"]] = None
     ) -> "Product":
-        """
-        Класс-метод для создания нового товара.
-        При наличии duplicates_list ищется товар с таким же именем.
-        Если найден дубликат, то количество суммируется, а цена становится максимальной.
-        Если duplicates_list не передан или дубликат не найден, создается новый объект.
-        """
         name: str = product_info.get("name")  # type: ignore
         description: str = product_info.get("description")  # type: ignore
         price: float = product_info.get("price")  # type: ignore

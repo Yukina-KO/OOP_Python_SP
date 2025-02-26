@@ -3,7 +3,6 @@ from src.Classes.Product.product import Product
 
 def test_product_creation() -> None:
     product = Product("Laptop", "A high-end gaming laptop", 1500.99, 10)
-
     assert product.name == "Laptop"
     assert product.description == "A high-end gaming laptop"
     assert product.price == 1500.99
@@ -30,3 +29,14 @@ def test_new_product_with_duplicates() -> None:
     )
     assert new_product.quantity == 5
     assert new_product.price == 800
+
+
+def test_product_str() -> None:
+    product = Product("Monitor", "4K Monitor", 299.99, 3)
+    assert str(product) == "Monitor, 299.99 руб. Остаток: 3 шт."
+
+
+def test_product_addition() -> None:
+    product1 = Product("Item1", "Desc1", 100, 10)
+    product2 = Product("Item2", "Desc2", 200, 2)
+    assert product1 + product2 == 1400
