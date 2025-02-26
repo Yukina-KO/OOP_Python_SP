@@ -1,5 +1,9 @@
+import pytest
+
 from src.Classes.Category.category import Category
 from src.Classes.Product.product import Product
+from src.Classes.Product.smartphone import Smartphone
+from src.Classes.Product.lawn_grass import LawnGrass
 
 
 def test_category_creation() -> None:
@@ -41,3 +45,20 @@ def test_category_iteration() -> None:
     assert len(products) == 2
     assert products[0].name == "Item1"
     assert products[1].name == "Item2"
+
+
+def test_add_product_valid() -> None:
+    category = Category("Test", "Test desc", [])
+    product = Product("TestItem", "Test desc", 50.0, 2)
+    smartphone = Smartphone("Phone", "Smartphone", 1000, 5, 2.5, "X1", 128, "Black")
+    grass = LawnGrass("Grass", "Green grass", 50, 20, "Russia", "10-14 дней", "Green")
+    category.add_product(product)
+    category.add_product(smartphone)
+    category.add_product(grass)
+    assert len(category.get_products()) == 3
+
+
+def test_add_product_invalid() -> None:
+    category = Category("Test", "Test desc", [])
+    with pytest.raises(TypeError):
+        category.add_product("not_a_product")
