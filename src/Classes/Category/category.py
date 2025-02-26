@@ -2,6 +2,8 @@ from typing import List
 
 from src.Classes.Product.product import Product
 
+from .category_iterator import CategoryIterator
+
 
 class Category:
     category_count: int = 0
@@ -11,9 +13,12 @@ class Category:
         self.name: str = name
         self.description: str = description
         self.__products: List[Product] = products
-
         Category.category_count += 1
         Category.product_count = len(self.__products)
+
+    def __str__(self) -> str:
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
 
     def add_product(self, product: Product) -> None:
         """Добавляет продукт в категорию, если он является экземпляром Product или его наследником."""
@@ -24,13 +29,11 @@ class Category:
 
     @property
     def products(self) -> str:
-        """
-        Геттер, возвращающий список товаров в виде строки.
-        Формат строки: 'Название продукта, 80 руб. Остаток: 15 шт.'
-        Каждая запись разделяется символом перевода строки.
-        """
-        lines: List[str] = []
-        for prod in self.__products:
-            line: str = f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт."
-            lines.append(line)
-        return "\n".join(lines)
+        return "\n".join(str(product) for product in self.__products)
+
+    def get_products(self) -> List[Product]:
+        """Возвращает список продуктов категории"""
+        return self.__products
+
+    def __iter__(self) -> "CategoryIterator":
+        return CategoryIterator(self)
