@@ -1,16 +1,22 @@
 import pytest
+from pytest import CaptureFixture
 
+from src.Classes.Product.lawn_grass import LawnGrass
 from src.Classes.Product.product import Product
 from src.Classes.Product.smartphone import Smartphone
-from src.Classes.Product.lawn_grass import LawnGrass
 
 
-def test_product_creation() -> None:
+def test_product_creation(capsys: CaptureFixture[str]) -> None:
     product = Product("Laptop", "A high-end gaming laptop", 1500.99, 10)
     assert product.name == "Laptop"
     assert product.description == "A high-end gaming laptop"
     assert product.price == 1500.99
     assert product.quantity == 10
+    captured = capsys.readouterr()
+    assert (
+        "Создан объект класса Product с параметрами: "
+        "('Laptop', 'A high-end gaming laptop', 1500.99, 10)" in captured.out
+    )
 
 
 def test_product_price_setter() -> None:
@@ -19,10 +25,12 @@ def test_product_price_setter() -> None:
     assert product.price == 1200.00
 
 
-def test_product_price_negative() -> None:
+def test_product_price_negative(capsys: CaptureFixture[str]) -> None:
     product = Product("Tablet", "A lightweight tablet", 499.99, 7)
     product.price = -50
     assert product.price == 499.99
+    captured = capsys.readouterr()
+    assert "Цена не должна быть нулевая или отрицательная" in captured.out
 
 
 def test_new_product_with_duplicates() -> None:
@@ -54,6 +62,7 @@ def test_smartphone_creation() -> None:
     assert smartphone.memory == 128
     assert smartphone.color == "Black"
     assert str(smartphone) == "Phone (X1, 128GB, Black), 1000.0 руб. Остаток: 5 шт."
+    assert "Создан объект класса Smartphone с параметрами: ('Phone', 'Smartphone', 1000.0, 5, 2.5, 'X1', 128, 'Black')"
 
 
 def test_lawn_grass_creation() -> None:
@@ -63,16 +72,20 @@ def test_lawn_grass_creation() -> None:
     assert grass.germination_period == "10-14 дней"
     assert grass.color == "Green"
     assert str(grass) == "Grass (Russia, Green), 50.0 руб. Остаток: 20 шт."
+    assert (
+        "Создан объект класса LawnGrass с параметрами: "
+        "('Grass', 'Green grass', 50.0, 20, 'Russia', '10-14 дней', 'Green')"
+    )
 
 
 def test_addition_same_class() -> None:
     smartphone1 = Smartphone("Phone1", "Desc", 1000, 2, 2.5, "X1", 128, "Black")
     smartphone2 = Smartphone("Phone2", "Desc", 2000, 3, 3.0, "X2", 256, "White")
-    assert smartphone1 + smartphone2 == 8000  # 1000*2 + 2000*3
+    assert smartphone1 + smartphone2 == 8000
 
     grass1 = LawnGrass("Grass1", "Desc", 50, 10, "Russia", "10-14 дней", "Green")
     grass2 = LawnGrass("Grass2", "Desc", 100, 5, "USA", "7-10 дней", "Dark Green")
-    assert grass1 + grass2 == 1000  # 50*10 + 100*5
+    assert grass1 + grass2 == 1000
 
 
 def test_addition_different_classes() -> None:
