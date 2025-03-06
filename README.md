@@ -2,7 +2,7 @@
 
 ## Проект "OOP_Python_SP"
 
-Данный проект реализует три основные сущности: **Category** (Категория), **Product** (Продукт) и **CategoryIterator** (Итератор категории). Также присутствуют тесты, проверяющие их корректность.
+Данный проект реализует три основные сущности: **Category** (Категория), **Product** (Продукт) и **CategoryIterator** (Итератор категории). В дополнение к базовому классу `Product`, добавлены специализированные классы **Smartphone** (Смартфон) и **LawnGrass** (Газонная трава). Также присутствуют тесты, проверяющие их корректность.
 
 ## Структура проекта
 
@@ -18,7 +18,9 @@ OOP_Python_SP/
 │       │   ├── category_iterator.py
 │       ├── Product/
 │       │   ├── __init__.py
-│       │   └── product.py
+│       │   ├── product.py
+│       │   ├── smartphone.py
+│       │   ├── lawn_grass.py
 │── tests/
 │   ├── __init__.py
 │   ├── test_category.py
@@ -33,6 +35,8 @@ OOP_Python_SP/
 ### 1. Класс `Category`
 
 **Файл:** `src/Classes/Category/category.py`
+
+Класс `Category` отвечает за управление категориями товаров.
 
 ```python
 from typing import List
@@ -99,41 +103,52 @@ class CategoryIterator:
 
 **Файл:** `src/Classes/Product/product.py`
 
+Класс `Product` реализует базовую логику товаров.
+
 ```python
-from typing import Dict, List, Optional, Union
-
 class Product:
-    product_count: int = 0
+    ...  # Основная реализация класса
+```
 
-    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-        self.name: str = name
-        self.description: str = description
-        self.__price: float = price
-        self.quantity: int = quantity
-        Product.product_count += 1
+### 4. Класс `Smartphone`
+
+**Файл:** `src/Classes/Product/smartphone.py`
+
+```python
+from .product import Product
+
+class Smartphone(Product):
+    def __init__(
+        self, name: str, description: str, price: float, quantity: int, efficiency: float, model: str, memory: int, color: str
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
 
     def __str__(self) -> str:
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+        return f"{self.name} ({self.model}, {self.memory}GB, {self.color}), {self.price} руб. Остаток: {self.quantity} шт."
+```
 
-    def __add__(self, other: "Product") -> float:
-        if not isinstance(other, Product):
-            raise TypeError("Можно складывать только объекты Product")
-        return (self.price * self.quantity) + (other.price * other.quantity)
+### 5. Класс `LawnGrass`
 
-    @property
-    def price(self) -> float:
-        return self.__price
+**Файл:** `src/Classes/Product/lawn_grass.py`
 
-    @price.setter
-    def price(self, new_price: float) -> None:
-        if new_price <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-            return
-        if new_price < self.__price:
-            answer: str = input(f"Вы действительно хотите понизить цену с {self.__price} до {new_price}? (y/n): ")
-            if answer.lower() != "y":
-                return
-        self.__price = new_price
+```python
+from .product import Product
+
+class LawnGrass(Product):
+    def __init__(
+        self, name: str, description: str, price: float, quantity: int, country: str, germination_period: str, color: str
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.country}, {self.color}), {self.price} руб. Остаток: {self.quantity} шт."
 ```
 
 ## Запуск тестов
