@@ -1,9 +1,9 @@
 import pytest
 
 from src.Classes.Category.category import Category
+from src.Classes.Product.lawn_grass import LawnGrass
 from src.Classes.Product.product import Product
 from src.Classes.Product.smartphone import Smartphone
-from src.Classes.Product.lawn_grass import LawnGrass
 
 
 def test_category_creation() -> None:

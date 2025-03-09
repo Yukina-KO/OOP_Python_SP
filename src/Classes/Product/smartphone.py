@@ -11,13 +11,16 @@ class Smartphone(Product):
         efficiency: float,
         model: str,
         memory: int,
-        color: str
+        color: str,
     ) -> None:
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
-        self.memory = memory  # в ГБ
+        self.memory = memory
         self.color = color
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.model}, {self.memory}GB, {self.color}), {self.price} руб. Остаток: {self.quantity} шт."
+        return (
+            f"{self.name} ({self.model}, {self.memory}GB, {self.color}), {self.price} руб. "
+            f"Остаток: {self.quantity} шт."
+        )

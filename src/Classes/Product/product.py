@@ -1,7 +1,10 @@
 from typing import Dict, List, Optional, Union
 
+from .base_product import BaseProduct
+from .debug_mixin import DebugMixin
 
-class Product:
+
+class Product(DebugMixin, BaseProduct):
     product_count: int = 0
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
@@ -10,6 +13,7 @@ class Product:
         self.__price: float = price
         self.quantity: int = quantity
         Product.product_count += 1
+        super().__init__(name, description, price, quantity)
 
     def __str__(self) -> str:
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
