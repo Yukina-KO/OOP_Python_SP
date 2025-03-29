@@ -93,3 +93,9 @@ def test_addition_different_classes() -> None:
     grass = LawnGrass("Grass", "Desc", 50, 10, "Russia", "10-14 дней", "Green")
     with pytest.raises(TypeError):
         smartphone + grass
+
+
+def test_product_zero_quantity() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        Product("Invalid Product", "Test description", 100.0, 0)
+    assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"

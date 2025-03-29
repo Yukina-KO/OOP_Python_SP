@@ -62,3 +62,15 @@ def test_add_product_invalid() -> None:
     category = Category("Test", "Test desc", [])
     with pytest.raises(TypeError):
         category.add_product("not_a_product")
+
+
+def test_category_middle_price_with_products() -> None:
+    product1 = Product("Item1", "Desc1", 100.0, 5)
+    product2 = Product("Item2", "Desc2", 200.0, 3)
+    category = Category("TestCat", "Test Desc", [product1, product2])
+    assert category.middle_price() == 150.0
+
+
+def test_category_middle_price_empty() -> None:
+    category = Category("EmptyCat", "Empty Desc", [])
+    assert category.middle_price() == 0.0
